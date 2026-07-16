@@ -1,4 +1,10 @@
+"use client";
+
+import { useCarrinho } from "@/context/CartContext";
+
 export default function Header() {
+  const { carrinho } = useCarrinho();
+
   return (
     <header className="relative w-full overflow-hidden">
 
@@ -53,23 +59,44 @@ export default function Header() {
             </span>
 
 
-            <a
-              className="
-  whitespace-nowrap
-  rounded-full
-  bg-white/20
-  px-2
-  py-0.5
-  text-[9px]
-  font-bold
-  sm:px-6
-  sm:py-2
-  sm:text-base
-"
-              
-            >
-              💬 WhatsApp
-            </a>
+            <div className="flex items-center gap-2">
+
+              <a
+                className="
+                  whitespace-nowrap
+                  rounded-full
+                  bg-white/20
+                  px-2
+                  py-0.5
+                  text-[9px]
+                  font-bold
+                  sm:px-6
+                  sm:py-2
+                  sm:text-base
+                "
+              >
+                💬 WhatsApp
+              </a>
+
+
+              <button
+                className="
+                  whitespace-nowrap
+                  rounded-full
+                  bg-white/20
+                  px-2
+                  py-0.5
+                  text-[9px]
+                  font-bold
+                  sm:px-6
+                  sm:py-2
+                  sm:text-base
+                "
+              >
+                🛒 {carrinho.length}
+              </button>
+
+            </div>
 
           </div>
 
