@@ -9,46 +9,41 @@ import {
 
 import { Produto } from "@/types/produto";
 
-
-interface ItemCarrinho {
+export interface ItemCarrinho {
   produto: Produto;
   quantidade: number;
 }
 
-
 interface CartContextType {
   carrinho: ItemCarrinho[];
-  adicionarAoCarrinho: (produto: Produto) => void;
-  removerDoCarrinho: (id: number) => void;
-}
+  quantidadeItens: number;
+  totalCarrinho: number;
 
+  adicionarAoCarrinho: (produto: Produto) => void;
+  aumentarQuantidade: (id: number) => void;
+  diminuirQuantidade: (id: number) => void;
+  removerDoCarrinho: (id: number) => void;
+  limparCarrinho: () => void;
+}
 
 const CartContext = createContext<CartContextType | undefined>(
   undefined
 );
 
-
 interface CartProviderProps {
   children: ReactNode;
 }
 
-
 export function CartProvider({ children }: CartProviderProps) {
-
   const [carrinho, setCarrinho] = useState<ItemCarrinho[]>([]);
 
-
   function adicionarAoCarrinho(produto: Produto) {
-
     setCarrinho((itensAtuais) => {
-
-      const produtoExistente = itensAtuais.find(
+      const existente = itensAtuais.find(
         (item) => item.produto.id === produto.id
       );
 
-
-      if (produtoExistente) {
-
+      if (existente) {
         return itensAtuais.map((item) =>
           item.produto.id === produto.id
             ? {
@@ -57,9 +52,7 @@ export function CartProvider({ children }: CartProviderProps) {
               }
             : item
         );
-
       }
-
 
       return [
         ...itensAtuais,
@@ -68,42 +61,78 @@ export function CartProvider({ children }: CartProviderProps) {
           quantidade: 1,
         },
       ];
-
     });
-
   }
 
-
-  function removerDoCarrinho(id: number) {
-
+  function aumentarQuantidade(id: number) {
     setCarrinho((itensAtuais) =>
-      itensAtuais.filter(
-        (item) => item.produto.id !== id
+      itensAtuais.map((item) =>
+        item.produto.id === id
+          ? {
+              ...item,
+              quantidade: item.quantidade + 1,
+            }
+          : item
       )
     );
-
   }
 
+  function diminuirQuantidade(id: number) {
+    setCarrinho((itensAtuais) =>
+      itensAtuais
+        .map((item) =>
+          item.produto.id === id
+            ? {
+                ...item,
+                quantidade: item.quantidade - 1,
+              }
+            : item
+        )
+        .filter((item) => item.quantidade > 0)
+    );
+  }
+
+  function removerDoCarrinho(id: number) {
+    setCarrinho((itensAtuais) =>
+      itensAtuais.filter((item) => item.produto.id !== id)
+    );
+  }
+
+  function limparCarrinho() {
+    setCarrinho([]);
+  }
+
+  const quantidadeItens = carrinho.reduce(
+    (total, item) => total + item.quantidade,
+    0
+  );
+
+  const totalCarrinho = carrinho.reduce(
+    (total, item) =>
+      total + item.produto.preco * item.quantidade,
+    0
+  );
 
   return (
     <CartContext.Provider
       value={{
         carrinho,
+        quantidadeItens,
+        totalCarrinho,
         adicionarAoCarrinho,
+        aumentarQuantidade,
+        diminuirQuantidade,
         removerDoCarrinho,
+        limparCarrinho,
       }}
     >
       {children}
     </CartContext.Provider>
   );
-
 }
 
-
 export function useCarrinho() {
-
   const contexto = useContext(CartContext);
-
 
   if (!contexto) {
     throw new Error(
@@ -111,7 +140,5 @@ export function useCarrinho() {
     );
   }
 
-
   return contexto;
-
 }

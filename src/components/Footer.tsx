@@ -14,7 +14,7 @@ export default function Footer() {
 
 
         <a
-          href="#"
+          href="https://wa.me/5511957333006"
           className="rounded-full bg-white px-6 py-3 font-semibold text-pink-700 transition hover:bg-pink-100"
         >
           Fale conosco pelo WhatsApp
